@@ -36,7 +36,9 @@ class CSS {
 		if ( is_object( $title ) && $title->exists() ) {
 			# Article actually in the db
       if( is_array( $wgCSSNotSanitizedNamespaceIDs ) && in_array( $title->getNamespace(), $wgCSSNotSanitizedNamespaceIDs, true) == false ) {
-        $headItem .= '<!-- Error. Only "Mediawiki:" namespace allowed. You use: ' . $title->getNamespace() . ' -->';
+        $headItem .= '<!-- Error in ' . substr( $css, 0, 30 ) . ( strlen( $css ) > 30 ? '...' : '' )
+          . '. Only namespaces [' . join(',',$wgCSSNotSanitizedNamespaceIDs) . '] allowed.'
+          . ' You use: ' . $title->getNamespace() . ' (namespace id) -->';
       } else {
         $params = "action=raw&ctype=text/css&$rawProtection";
         $url = $title->getLocalURL( $params );
