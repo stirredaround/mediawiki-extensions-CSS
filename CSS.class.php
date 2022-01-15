@@ -35,9 +35,13 @@ class CSS {
 
 		if ( is_object( $title ) && $title->exists() ) {
 			# Article actually in the db
-			$params = "action=raw&ctype=text/css&$rawProtection";
-			$url = $title->getLocalURL( $params );
-			$headItem .= Html::linkedStyle( $url );
+			if ( in_array( $title->getNamespace(), array(8), true) == false ) {
+				$headItem .= '<!-- Error. Only "Mediawiki:" namespace allowed. You use: ' . $title->getNamespace() . ' -->';
+			} else {
+				$params = "action=raw&ctype=text/css&$rawProtection";
+				$url = $title->getLocalURL( $params );
+				$headItem .= Html::linkedStyle( $url );
+			}
 		} elseif ( $css[0] == '/' ) {
 			# Regular file
 			$base = $wgCSSPath === false ? $wgStylePath : $wgCSSPath;
@@ -80,11 +84,12 @@ class CSS {
 	 * @return bool true
 	 */
 	public static function onRawPageViewBeforeOutput( &$rawPage, &$text ) {
+		/**
 		global $wgCSSIdentifier;
-
 		if ( $rawPage->getRequest()->getBool( $wgCSSIdentifier ) ) {
 			$text = Sanitizer::checkCss( $text );
 		}
+		*/
 		return true;
 	}
 }
