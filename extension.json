@@ -21,7 +21,7 @@
 		]
 	},
 	"AutoloadClasses": {
-		"CSS": "CSS.class.php"
+		"CSS": "src/CSS.php"
 	},
 	"Hooks": {
 		"ParserFirstCallInit": "CSS::onParserFirstCallInit",
@@ -29,6 +29,7 @@
 	},
 	"config": {
 		"CSSPath": false,
+		"CSSNotSanitizedNamespaceIDs": false,
 		"CSSIdentifier": "css-extension"
 	},
 	"manifest_version": 1

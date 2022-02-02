@@ -23,7 +23,7 @@ class CSS {
 	 * @return string
 	 */
 	public static function CSSRender( &$parser, $css ) {
-		global $wgCSSPath, $wgStylePath, $wgCSSIdentifier;
+		global $wgCSSPath, $wgStylePath, $wgCSSIdentifier, $wgCSSNotSanitizedNamespaceIDs;
 
 		$css = trim( $css );
 		if ( !$css ) {
@@ -35,9 +35,17 @@ class CSS {
 
 		if ( is_object( $title ) && $title->exists() ) {
 			# Article actually in the db
-			$params = "action=raw&ctype=text/css&$rawProtection";
-			$url = $title->getLocalURL( $params );
-			$headItem .= Html::linkedStyle( $url );
+			if ( is_array( $wgCSSNotSanitizedNamespaceIDs ) && in_array(
+				$title->getNamespace(), $wgCSSNotSanitizedNamespaceIDs, true ) == false
+			) {
+				$headItem .= '<!-- Error in ' . substr( $css, 0, 30 ) . ( strlen( $css ) > 30 ? '...' : '' )
+					. '. Only namespaces [' . implode( ',', $wgCSSNotSanitizedNamespaceIDs ) . '] allowed.'
+					. ' You use: ' . $title->getNamespace() . ' (namespace id) -->';
+			} else {
+				$params = "action=raw&ctype=text/css&$rawProtection";
+				$url = $title->getLocalURL( $params );
+				$headItem .= Html::linkedStyle( $url );
+			}
 		} elseif ( $css[0] == '/' ) {
 			# Regular file
 			$base = $wgCSSPath === false ? $wgStylePath : $wgCSSPath;
@@ -67,22 +75,21 @@ class CSS {
 
 	/**
 	 * @param Parser $parser
-	 * @return bool true
 	 */
 	public static function onParserFirstCallInit( $parser ) {
 		$parser->setFunctionHook( 'css', 'CSS::CSSRender' );
-		return true;
 	}
 
 	/**
-	 * @param RawPage &$rawPage
+	 * @param RawAction &$rawAction
 	 * @param string &$text
 	 * @return bool true
 	 */
-	public static function onRawPageViewBeforeOutput( &$rawPage, &$text ) {
-		global $wgCSSIdentifier;
+	public static function onRawPageViewBeforeOutput( &$rawAction, &$text ) {
+		global $wgCSSIdentifier, $wgCSSNotSanitizedNamespaceIDs;
 
-		if ( $rawPage->getRequest()->getBool( $wgCSSIdentifier ) ) {
+		if ( is_array( $wgCSSNotSanitizedNamespaceIDs ) == false && $rawAction->getRequest()
+				->getBool( $wgCSSIdentifier ) ) {
 			$text = Sanitizer::checkCss( $text );
 		}
 		return true;
