@@ -61,11 +61,7 @@ class CSS {
 			# sanitized user CSS
 			$css = Sanitizer::checkCss( $css );
 
-			# Encode data URI and append link tag
-			$dataPrefix = 'data:text/css;charset=UTF-8;base64,';
-			$url = $dataPrefix . base64_encode( $css );
-
-			$headItem .= Html::linkedStyle( $url );
+			$headItem .= Html::inlineStyle( $url, 'all', [ 'type' => 'text/css' ] );
 		}
 
 		$headItem .= '<!-- End Extension:CSS -->';
