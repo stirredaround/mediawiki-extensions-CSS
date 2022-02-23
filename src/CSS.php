@@ -61,7 +61,7 @@ class CSS {
 			# sanitized user CSS
 			$css = Sanitizer::checkCss( $css );
 
-			$headItem .= Html::inlineStyle( $url, 'all', [ 'type' => 'text/css' ] );
+			$headItem .= Html::inlineStyle( $css, 'all', [ 'type' => 'text/css' ] );
 		}
 
 		$headItem .= '<!-- End Extension:CSS -->';
